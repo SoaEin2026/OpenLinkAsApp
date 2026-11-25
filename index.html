@@ -28,7 +28,7 @@
         // 3. Fallback message if the browser blocks auto-closing
         document.querySelector('h2').textContent = "Microsoft Word launched!";
         document.querySelector('p').textContent = "Your browser prevented auto-closing. You may safely close this tab.";
-      }, 2500);
+      }, 10000);
     } else {
       document.body.innerHTML = "<h2>Invalid or unauthorized document link.</h2>";
     }
