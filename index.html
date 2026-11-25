@@ -12,10 +12,14 @@
       --bg: #ffffff;
       --text: #0f172a;
       --muted: #475569;
-      --btn-bg: #2b579a;
-      --btn-hover: #1e3f73;
+      --btn-bg: rgba(43, 87, 154, 0.85);
+      --btn-hover: rgba(30, 63, 115, 0.92);
       --btn-text: #ffffff;
-      --glow: radial-gradient(circle, rgba(43, 87, 154, 0.14) 0%, rgba(59, 130, 246, 0.06) 45%, transparent 72%);
+      --btn-border: rgba(0, 0, 0, 0.25);
+      --btn-inset-top: inset 0 1px 1px rgba(255, 255, 255, 0.55);
+      --btn-inset-bottom: inset 0 -2px 4px rgba(0, 0, 0, 0.25);
+      --glow-primary: radial-gradient(circle, rgba(43, 87, 154, 0.14) 0%, rgba(59, 130, 246, 0.06) 45%, transparent 72%);
+      --glow-secondary: radial-gradient(circle, rgba(14, 165, 233, 0.10) 0%, rgba(99, 102, 241, 0.05) 48%, transparent 74%);
     }
 
     @media (prefers-color-scheme: dark) {
@@ -23,10 +27,14 @@
         --bg: #0a1b2e;
         --text: #f8fafc;
         --muted: #cbd5e1;
-        --btn-bg: #3b73c4;
-        --btn-hover: #5288d8;
+        --btn-bg: rgba(59, 115, 196, 0.82);
+        --btn-hover: rgba(82, 136, 216, 0.9);
         --btn-text: #ffffff;
-        --glow: radial-gradient(circle, rgba(56, 189, 248, 0.18) 0%, rgba(59, 115, 196, 0.10) 45%, transparent 72%);
+        --btn-border: rgba(0, 0, 0, 0.25);
+        --btn-inset-top: inset 0 1px 1px rgba(255, 255, 255, 0.45);
+        --btn-inset-bottom: inset 0 -2px 4px rgba(0, 0, 0, 0.25);
+        --glow-primary: radial-gradient(circle, rgba(56, 189, 248, 0.18) 0%, rgba(59, 115, 196, 0.10) 45%, transparent 72%);
+        --glow-secondary: radial-gradient(circle, rgba(99, 102, 241, 0.14) 0%, rgba(20, 184, 166, 0.07) 48%, transparent 74%);
       }
     }
 
@@ -49,18 +57,31 @@
       transition: background-color 0.2s ease, color 0.2s ease;
     }
 
-    body::before {
+    body::before,
+    body::after {
       content: "";
       position: fixed;
+      pointer-events: none;
+      filter: blur(52px);
+      z-index: 0;
+    }
+
+    body::before {
       top: 40px;
       left: 50%;
       transform: translateX(-50%);
       width: min(760px, 120vw);
       height: min(520px, 75vh);
-      background: var(--glow);
-      filter: blur(48px);
-      pointer-events: none;
-      z-index: 0;
+      background: var(--glow-primary);
+    }
+
+    body::after {
+      top: 16px;
+      left: 68%;
+      transform: translateX(-25%);
+      width: min(640px, 100vw);
+      height: min(460px, 65vh);
+      background: var(--glow-secondary);
     }
 
     h2, p, .btn {
@@ -90,20 +111,29 @@
     .btn {
       display: inline-block;
       margin-top: 20px;
-      padding: 10px 20px;
+      padding: 11px 22px;
       background-color: var(--btn-bg);
       color: var(--btn-text);
       text-decoration: none;
-      border-radius: 6px;
+      border: 1px solid var(--btn-border);
+      border-radius: 12px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: var(--btn-inset-top), var(--btn-inset-bottom);
       font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: clamp(0.875rem, 0.8vw + 0.65rem, 0.975rem);
       font-weight: 600;
       letter-spacing: -0.01em;
-      transition: background-color 0.15s ease;
+      transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
     }
 
     .btn:hover {
       background-color: var(--btn-hover);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25);
     }
   </style>
 </head>
