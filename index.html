@@ -85,7 +85,7 @@
 </head>
 <body>
   <h2 id="statusTitle">Launching Microsoft Word...</h2>
-  <p id="statusMessage">If a prompt appears, choose to open Word. This page will check again in 10 seconds.</p>
+  <p id="statusMessage">If a prompt appears, choose to open Word. This page will update in 10 seconds.</p>
   <a id="fallbackLink" class="btn" href="#" style="display: none;">Open in Word</a>
 
   <script>
@@ -105,23 +105,10 @@
       // 1. Trigger the Word desktop protocol
       window.location.href = wordUri;
 
-      // 2. Wait 10 seconds before attempting to close or showing fallback instructions
+      // 2. After 10 seconds, update instructions and keep the fallback button available
       setTimeout(() => {
-        if (window.closed) return;
-
-        try {
-          if (window.opener || window.history.length <= 1) {
-            window.close();
-          }
-        } catch (err) {
-          // Ignore close errors in restricted browser contexts
-        }
-
-        // 3. Fallback message if the tab remains open
-        if (!window.closed) {
-          titleEl.textContent = "Microsoft Word launch attempted";
-          msgEl.textContent = "If Word did not open or you missed the prompt, click the button below. You may close this tab when finished.";
-        }
+        titleEl.textContent = "Microsoft Word launch attempted";
+        msgEl.textContent = "If Word did not open or you missed the prompt, click the button below. You may close this tab when finished.";
       }, 10000);
     } else {
       titleEl.textContent = "Invalid or unauthorized document link.";
