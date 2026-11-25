@@ -2,35 +2,129 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Opening in Word...</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    body { font-family: Segoe UI, sans-serif; text-align: center; padding-top: 80px; color: #333; }
+    :root {
+      --bg: #ffffff;
+      --text: #1f2937;
+      --muted: #4b5563;
+      --btn-bg: #2b579a;
+      --btn-hover: #1e3f73;
+      --btn-text: #ffffff;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0a1b2e;
+        --text: #f1f5f9;
+        --muted: #cbd5e1;
+        --btn-bg: #3b73c4;
+        --btn-hover: #5288d8;
+        --btn-text: #ffffff;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 80px clamp(16px, 4vw, 32px) 32px;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: clamp(0.95rem, 1.2vw + 0.65rem, 1.0625rem);
+      line-height: 1.6;
+      text-align: center;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    h2 {
+      margin: 0 auto 12px;
+      max-width: 24ch;
+      font-family: "Fraunces", Georgia, serif;
+      font-size: clamp(1.5rem, 3vw + 0.85rem, 2.25rem);
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--text);
+    }
+
+    p {
+      margin: 0 auto;
+      max-width: 52ch;
+      font-size: clamp(0.9375rem, 1vw + 0.65rem, 1.0625rem);
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 18px;
+      background-color: var(--btn-bg);
+      color: var(--btn-text);
+      text-decoration: none;
+      border-radius: 6px;
+      font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: clamp(0.875rem, 0.8vw + 0.65rem, 1rem);
+      font-weight: 600;
+      transition: background-color 0.15s ease;
+    }
+
+    .btn:hover {
+      background-color: var(--btn-hover);
+    }
   </style>
 </head>
 <body>
-  <h2>Opening your document in Microsoft Word...</h2>
-  <p>You can close this browser tab once Word launches.</p>
+  <h2 id="statusTitle">Launching Microsoft Word...</h2>
+  <p id="statusMessage">If a prompt appears, choose to open Word. This page will check again in 10 seconds.</p>
+  <a id="fallbackLink" class="btn" href="#" style="display: none;">Open in Word</a>
 
   <script>
     const params = new URLSearchParams(window.location.search);
     const fileUrl = params.get('file');
     const allowedDomain = "https://prefchem365.sharepoint.com/";
 
+    const titleEl = document.getElementById('statusTitle');
+    const msgEl = document.getElementById('statusMessage');
+    const linkEl = document.getElementById('fallbackLink');
+
     if (fileUrl && fileUrl.startsWith(allowedDomain)) {
+      const wordUri = "ms-word:ofe|u|" + fileUrl;
+      linkEl.href = wordUri;
+      linkEl.style.display = "inline-block";
+
       // 1. Trigger the Word desktop protocol
-      window.location.href = "ms-word:ofe|u|" + fileUrl;
+      window.location.href = wordUri;
 
-      // 2. Wait 2.5 seconds for the protocol prompt to fire, then try closing
+      // 2. Wait 10 seconds before attempting to close or showing fallback instructions
       setTimeout(() => {
-        window.open('', '_self', ''); // Workaround for certain Chromium versions
-        window.close();
+        if (window.closed) return;
 
-        // 3. Fallback message if the browser blocks auto-closing
-        document.querySelector('h2').textContent = "Microsoft Word launched!";
-        document.querySelector('p').textContent = "Your browser prevented auto-closing. You may safely close this tab.";
+        try {
+          if (window.opener || window.history.length <= 1) {
+            window.close();
+          }
+        } catch (err) {
+          // Ignore close errors in restricted browser contexts
+        }
+
+        // 3. Fallback message if the tab remains open
+        if (!window.closed) {
+          titleEl.textContent = "Microsoft Word launch attempted";
+          msgEl.textContent = "If Word did not open or you missed the prompt, click the button below. You may close this tab when finished.";
+        }
       }, 10000);
     } else {
-      document.body.innerHTML = "<h2>Invalid or unauthorized document link.</h2>";
+      titleEl.textContent = "Invalid or unauthorized document link.";
+      msgEl.textContent = "The requested file URL is missing or outside the allowed SharePoint domain.";
+      linkEl.style.display = "none";
     }
   </script>
 </body>
